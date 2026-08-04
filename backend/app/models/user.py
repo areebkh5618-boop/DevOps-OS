@@ -1,7 +1,9 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text
-from sqlalchemy.sql import func
-from app.db.session import Base
 import enum
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
+from sqlalchemy.sql import func
+
+from app.db.session import Base
 
 
 class UserRole(str, enum.Enum):

@@ -1,5 +1,6 @@
+
 from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import List, Optional
+
 from app.core.security import get_current_user
 from app.models.user import User
 from app.services.github_service import get_github_service
@@ -16,7 +17,7 @@ async def github_status(current_user: User = Depends(get_current_user)):
 
 @router.get("/repos")
 async def list_repos(
-    username: Optional[str] = None,
+    username: str | None = None,
     current_user: User = Depends(get_current_user),
 ):
     svc = get_github_service(current_user.github_token)

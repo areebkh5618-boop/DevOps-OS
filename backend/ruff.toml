@@ -1,0 +1,23 @@
+target-version = "py312"
+line-length = 120
+
+[lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "B",
+    "BLE",
+    "DTZ",
+    "RUF",
+]
+
+ignore = [
+    "B008",   # FastAPI Depends()
+    "B904",   # raise from
+    "BLE001", # broad exception
+    "E501",   # long lines
+    "UP042",  # StrEnum
+    "RUF005", # list concatenation
+]

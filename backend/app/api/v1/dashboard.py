@@ -1,11 +1,13 @@
+import platform
+
+import psutil
 from fastapi import APIRouter, Depends
+
 from app.core.security import get_current_user
 from app.models.user import User
 from app.services.docker_service import docker_service
-from app.services.kubernetes_service import k8s_service
 from app.services.github_service import get_github_service
-import psutil
-import platform
+from app.services.kubernetes_service import k8s_service
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 

@@ -1,11 +1,12 @@
-from typing import Optional
+
 from app.core.config import settings
+
 try:
     from redis import asyncio as aioredis
 except Exception:  # pragma: no cover - imported at runtime
     aioredis = None
 
-_redis: Optional[aioredis.Redis] = None
+_redis: aioredis.Redis | None = None
 
 
 def redis_available() -> bool:

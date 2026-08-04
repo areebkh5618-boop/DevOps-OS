@@ -1,12 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+
 from app.core.security import get_current_user, require_roles
 from app.models.user import User
-from app.services.docker_service import docker_service
 from app.schemas.docker import (
-    ContainerInfo, ContainerStats, ImageInfo, VolumeInfo,
-    NetworkInfo, DockerSystemInfo, ContainerCreate
+    ContainerCreate,
+    ContainerInfo,
+    ContainerStats,
+    DockerSystemInfo,
+    ImageInfo,
+    NetworkInfo,
+    VolumeInfo,
 )
+from app.services.docker_service import docker_service
 
 router = APIRouter(prefix="/docker", tags=["Docker"])
 
@@ -24,7 +30,7 @@ async def get_system_info(current_user: User = Depends(get_current_user)):
     return docker_service.get_system_info()
 
 
-@router.get("/containers", response_model=List[ContainerInfo])
+@router.get("/containers", response_model=list[ContainerInfo])
 async def list_containers(
     all: bool = Query(True),
     current_user: User = Depends(get_current_user),
@@ -124,16 +130,16 @@ async def create_container(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/images", response_model=List[ImageInfo])
+@router.get("/images", response_model=list[ImageInfo])
 async def list_images(current_user: User = Depends(get_current_user)):
     return docker_service.list_images()
 
 
-@router.get("/volumes", response_model=List[VolumeInfo])
+@router.get("/volumes", response_model=list[VolumeInfo])
 async def list_volumes(current_user: User = Depends(get_current_user)):
     return docker_service.list_volumes()
 
 
-@router.get("/networks", response_model=List[NetworkInfo])
+@router.get("/networks", response_model=list[NetworkInfo])
 async def list_networks(current_user: User = Depends(get_current_user)):
     return docker_service.list_networks()

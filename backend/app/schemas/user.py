@@ -1,7 +1,7 @@
-from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
 from datetime import datetime
 from enum import Enum
+
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserRole(str, Enum):
@@ -13,7 +13,7 @@ class UserRole(str, Enum):
 class UserBase(BaseModel):
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=50)
-    full_name: Optional[str] = None
+    full_name: str | None = None
 
 
 class UserCreate(UserBase):
@@ -27,11 +27,11 @@ class UserLogin(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    email: Optional[EmailStr] = None
-    username: Optional[str] = None
-    full_name: Optional[str] = None
-    avatar_url: Optional[str] = None
-    github_token: Optional[str] = None
+    email: EmailStr | None = None
+    username: str | None = None
+    full_name: str | None = None
+    avatar_url: str | None = None
+    github_token: str | None = None
 
 
 class UserPasswordUpdate(BaseModel):
@@ -44,11 +44,11 @@ class UserResponse(UserBase):
     role: str
     is_active: bool
     is_verified: bool
-    avatar_url: Optional[str] = None
-    github_username: Optional[str] = None
-    github_id: Optional[str] = None
-    created_at: Optional[datetime] = None
-    last_login: Optional[datetime] = None
+    avatar_url: str | None = None
+    github_username: str | None = None
+    github_id: str | None = None
+    created_at: datetime | None = None
+    last_login: datetime | None = None
 
     class Config:
         from_attributes = True
@@ -61,8 +61,8 @@ class Token(BaseModel):
 
 
 class TokenPayload(BaseModel):
-    sub: Optional[str] = None
-    type: Optional[str] = None
+    sub: str | None = None
+    type: str | None = None
 
 
 class PasswordResetRequest(BaseModel):

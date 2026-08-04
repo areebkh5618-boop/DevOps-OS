@@ -1,13 +1,15 @@
-import httpx
-from typing import List, Optional, Dict, Any
 import logging
+from typing import Any
+
+import httpx
+
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 
 class GitHubService:
-    def __init__(self, token: Optional[str] = None):
+    def __init__(self, token: str | None = None):
         self.token = token or settings.GITHUB_TOKEN
         self.base_url = settings.GITHUB_API_URL
         self.headers = {
@@ -20,7 +22,7 @@ class GitHubService:
     def is_available(self) -> bool:
         return bool(self.token)
 
-    async def _request(self, method: str, path: str, params: Optional[Dict] = None) -> Any:
+    async def _request(self, method: str, path: str, params: dict | None = None) -> Any:
         if not self.is_available():
             return None
         async with httpx.AsyncClient() as client:
@@ -40,36 +42,36 @@ class GitHubService:
                 logger.error(f"GitHub API error: {e}")
                 return None
 
-    async def list_repos(self, username: Optional[str] = None, per_page: int = 30) -> List[Dict]:
+    async def list_repos(self, username: str | None = None, per_page: int = 30) -> list[dict]:
         if not self.is_available():
             return self._mock_repos()
         path = f"/users/{username}/repos" if username else "/user/repos"
         data = await self._request("GET", path, {"per_page": per_page, "sort": "updated"})
         return data or []
 
-    async def get_repo(self, owner: str, repo: str) -> Optional[Dict]:
+    async def get_repo(self, owner: str, repo: str) -> dict | None:
         if not self.is_available():
             return {"name": repo, "full_name": f"{owner}/{repo}", "private": False}
         return await self._request("GET", f"/repos/{owner}/{repo}")
 
-    async def list_workflows(self, owner: str, repo: str) -> List[Dict]:
+    async def list_workflows(self, owner: str, repo: str) -> list[dict]:
         if not self.is_available():
             return self._mock_workflows()
         data = await self._request("GET", f"/repos/{owner}/{repo}/actions/workflows")
         return (data or {}).get("workflows", [])
 
-    async def list_workflow_runs(self, owner: str, repo: str, per_page: int = 20) -> List[Dict]:
+    async def list_workflow_runs(self, owner: str, repo: str, per_page: int = 20) -> list[dict]:
         if not self.is_available():
             return self._mock_runs()
         data = await self._request("GET", f"/repos/{owner}/{repo}/actions/runs", {"per_page": per_page})
         return (data or {}).get("workflow_runs", [])
 
-    async def get_workflow_run(self, owner: str, repo: str, run_id: int) -> Optional[Dict]:
+    async def get_workflow_run(self, owner: str, repo: str, run_id: int) -> dict | None:
         if not self.is_available():
             return None
         return await self._request("GET", f"/repos/{owner}/{repo}/actions/runs/{run_id}")
 
-    async def list_workflow_jobs(self, owner: str, repo: str, run_id: int) -> List[Dict]:
+    async def list_workflow_jobs(self, owner: str, repo: str, run_id: int) -> list[dict]:
         if not self.is_available():
             return []
         data = await self._request("GET", f"/repos/{owner}/{repo}/actions/runs/{run_id}/jobs")
@@ -81,25 +83,25 @@ class GitHubService:
             return "[MOCK] Workflow run logs\nBuild succeeded in 2m 34s"
         return f"Logs for run {run_id} - use GitHub UI for full download"
 
-    async def list_commits(self, owner: str, repo: str, per_page: int = 20) -> List[Dict]:
+    async def list_commits(self, owner: str, repo: str, per_page: int = 20) -> list[dict]:
         if not self.is_available():
             return self._mock_commits()
         data = await self._request("GET", f"/repos/{owner}/{repo}/commits", {"per_page": per_page})
         return data or []
 
-    async def list_branches(self, owner: str, repo: str) -> List[Dict]:
+    async def list_branches(self, owner: str, repo: str) -> list[dict]:
         if not self.is_available():
             return [{"name": "main", "protected": True}, {"name": "develop", "protected": False}]
         data = await self._request("GET", f"/repos/{owner}/{repo}/branches")
         return data or []
 
-    async def list_releases(self, owner: str, repo: str) -> List[Dict]:
+    async def list_releases(self, owner: str, repo: str) -> list[dict]:
         if not self.is_available():
             return [{"tag_name": "v1.0.0", "name": "Initial Release", "published_at": "2024-01-01T00:00:00Z"}]
         data = await self._request("GET", f"/repos/{owner}/{repo}/releases")
         return data or []
 
-    def _mock_repos(self) -> List[Dict]:
+    def _mock_repos(self) -> list[dict]:
         return [
             {
                 "id": 1,
@@ -129,13 +131,13 @@ class GitHubService:
             },
         ]
 
-    def _mock_workflows(self) -> List[Dict]:
+    def _mock_workflows(self) -> list[dict]:
         return [
             {"id": 1, "name": "CI Pipeline", "path": ".github/workflows/ci.yml", "state": "active"},
             {"id": 2, "name": "Deploy Production", "path": ".github/workflows/deploy.yml", "state": "active"},
         ]
 
-    def _mock_runs(self) -> List[Dict]:
+    def _mock_runs(self) -> list[dict]:
         return [
             {
                 "id": 1001,
@@ -175,7 +177,7 @@ class GitHubService:
             },
         ]
 
-    def _mock_commits(self) -> List[Dict]:
+    def _mock_commits(self) -> list[dict]:
         return [
             {
                 "sha": "a1b2c3d",
@@ -196,5 +198,5 @@ class GitHubService:
         ]
 
 
-def get_github_service(token: Optional[str] = None) -> GitHubService:
+def get_github_service(token: str | None = None) -> GitHubService:
     return GitHubService(token)

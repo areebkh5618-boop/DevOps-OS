@@ -1,12 +1,20 @@
+
 from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import List, Optional
+
 from app.core.security import get_current_user, require_roles
 from app.models.user import User
-from app.services.kubernetes_service import k8s_service
 from app.schemas.kubernetes import (
-    NamespaceInfo, PodInfo, DeploymentInfo, ServiceInfo,
-    IngressInfo, ConfigMapInfo, SecretInfo, EventInfo, ScaleRequest
+    ConfigMapInfo,
+    DeploymentInfo,
+    EventInfo,
+    IngressInfo,
+    NamespaceInfo,
+    PodInfo,
+    ScaleRequest,
+    SecretInfo,
+    ServiceInfo,
 )
+from app.services.kubernetes_service import k8s_service
 
 router = APIRouter(prefix="/kubernetes", tags=["Kubernetes"])
 
@@ -16,12 +24,12 @@ async def k8s_status(current_user: User = Depends(get_current_user)):
     return {"available": k8s_service.is_available()}
 
 
-@router.get("/namespaces", response_model=List[NamespaceInfo])
+@router.get("/namespaces", response_model=list[NamespaceInfo])
 async def list_namespaces(current_user: User = Depends(get_current_user)):
     return k8s_service.list_namespaces()
 
 
-@router.get("/pods", response_model=List[PodInfo])
+@router.get("/pods", response_model=list[PodInfo])
 async def list_pods(
     namespace: str = Query("default"),
     current_user: User = Depends(get_current_user),
@@ -29,7 +37,7 @@ async def list_pods(
     return k8s_service.list_pods(namespace)
 
 
-@router.get("/deployments", response_model=List[DeploymentInfo])
+@router.get("/deployments", response_model=list[DeploymentInfo])
 async def list_deployments(
     namespace: str = Query("default"),
     current_user: User = Depends(get_current_user),
@@ -37,7 +45,7 @@ async def list_deployments(
     return k8s_service.list_deployments(namespace)
 
 
-@router.get("/services", response_model=List[ServiceInfo])
+@router.get("/services", response_model=list[ServiceInfo])
 async def list_services(
     namespace: str = Query("default"),
     current_user: User = Depends(get_current_user),
@@ -45,7 +53,7 @@ async def list_services(
     return k8s_service.list_services(namespace)
 
 
-@router.get("/ingresses", response_model=List[IngressInfo])
+@router.get("/ingresses", response_model=list[IngressInfo])
 async def list_ingresses(
     namespace: str = Query("default"),
     current_user: User = Depends(get_current_user),
@@ -53,7 +61,7 @@ async def list_ingresses(
     return k8s_service.list_ingresses(namespace)
 
 
-@router.get("/configmaps", response_model=List[ConfigMapInfo])
+@router.get("/configmaps", response_model=list[ConfigMapInfo])
 async def list_configmaps(
     namespace: str = Query("default"),
     current_user: User = Depends(get_current_user),
@@ -61,7 +69,7 @@ async def list_configmaps(
     return k8s_service.list_configmaps(namespace)
 
 
-@router.get("/secrets", response_model=List[SecretInfo])
+@router.get("/secrets", response_model=list[SecretInfo])
 async def list_secrets(
     namespace: str = Query("default"),
     current_user: User = Depends(get_current_user),
@@ -69,7 +77,7 @@ async def list_secrets(
     return k8s_service.list_secrets(namespace)
 
 
-@router.get("/events", response_model=List[EventInfo])
+@router.get("/events", response_model=list[EventInfo])
 async def list_events(
     namespace: str = Query("default"),
     current_user: User = Depends(get_current_user),
@@ -81,7 +89,7 @@ async def list_events(
 async def get_pod_logs(
     name: str,
     namespace: str = Query("default"),
-    container: Optional[str] = None,
+    container: str | None = None,
     tail: int = Query(100, ge=1, le=5000),
     current_user: User = Depends(get_current_user),
 ):

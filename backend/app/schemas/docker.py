@@ -1,6 +1,6 @@
+from typing import Any
+
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
-from datetime import datetime
 
 
 class ContainerStats(BaseModel):
@@ -21,32 +21,32 @@ class ContainerInfo(BaseModel):
     status: str
     state: str
     created: str
-    ports: Dict[str, Any] = {}
-    labels: Dict[str, str] = {}
-    mounts: List[Dict[str, Any]] = []
-    network_settings: Dict[str, Any] = {}
-    command: Optional[str] = None
-    stats: Optional[ContainerStats] = None
+    ports: dict[str, Any] = {}
+    labels: dict[str, str] = {}
+    mounts: list[dict[str, Any]] = []
+    network_settings: dict[str, Any] = {}
+    command: str | None = None
+    stats: ContainerStats | None = None
 
 
 class ContainerCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     image: str
-    command: Optional[str] = None
-    environment: Optional[Dict[str, str]] = None
-    ports: Optional[Dict[str, int]] = None  # container_port: host_port
-    volumes: Optional[Dict[str, str]] = None  # host_path: container_path
-    network: Optional[str] = None
+    command: str | None = None
+    environment: dict[str, str] | None = None
+    ports: dict[str, int] | None = None  # container_port: host_port
+    volumes: dict[str, str] | None = None  # host_path: container_path
+    network: str | None = None
     restart_policy: str = "no"
     detach: bool = True
 
 
 class ImageInfo(BaseModel):
     id: str
-    tags: List[str] = []
+    tags: list[str] = []
     size: int = 0
     created: str
-    labels: Dict[str, str] = {}
+    labels: dict[str, str] = {}
 
 
 class VolumeInfo(BaseModel):
@@ -54,7 +54,7 @@ class VolumeInfo(BaseModel):
     driver: str
     mountpoint: str
     created: str
-    labels: Dict[str, str] = {}
+    labels: dict[str, str] = {}
     scope: str = "local"
 
 
@@ -63,10 +63,10 @@ class NetworkInfo(BaseModel):
     name: str
     driver: str
     scope: str
-    ipam: Dict[str, Any] = {}
-    containers: Dict[str, Any] = {}
-    labels: Dict[str, str] = {}
-    created: Optional[str] = None
+    ipam: dict[str, Any] = {}
+    containers: dict[str, Any] = {}
+    labels: dict[str, str] = {}
+    created: str | None = None
 
 
 class DockerSystemInfo(BaseModel):

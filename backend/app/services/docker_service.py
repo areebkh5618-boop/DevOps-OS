@@ -1,18 +1,21 @@
-from typing import List, Optional, Dict, Any
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
-from app.core.config import settings
 from app.schemas.docker import (
-    ContainerInfo, ContainerStats, ImageInfo, VolumeInfo,
-    NetworkInfo, DockerSystemInfo, ContainerCreate
+    ContainerCreate,
+    ContainerInfo,
+    ContainerStats,
+    DockerSystemInfo,
+    ImageInfo,
+    NetworkInfo,
+    VolumeInfo,
 )
 
 logger = logging.getLogger(__name__)
 
 try:
     import docker
-    from docker.errors import NotFound, APIError
+    from docker.errors import APIError, NotFound
     DOCKER_SDK = True
 except ImportError:
     DOCKER_SDK = False
@@ -68,7 +71,7 @@ class DockerService:
             logger.error(f"Error getting Docker info: {e}")
             return DockerSystemInfo()
 
-    def list_containers(self, all: bool = True) -> List[ContainerInfo]:
+    def list_containers(self, all: bool = True) -> list[ContainerInfo]:
         if not self.is_available():
             return self._mock_containers()
         try:
@@ -98,7 +101,7 @@ class DockerService:
             logger.error(f"Error listing containers: {e}")
             return []
 
-    def get_container(self, container_id: str) -> Optional[ContainerInfo]:
+    def get_container(self, container_id: str) -> ContainerInfo | None:
         if not self.is_available():
             return None
         try:
@@ -127,7 +130,7 @@ class DockerService:
             logger.error(f"Error getting container: {e}")
             return None
 
-    def get_container_stats(self, container_id: str) -> Optional[ContainerStats]:
+    def get_container_stats(self, container_id: str) -> ContainerStats | None:
         if not self.is_available():
             return ContainerStats(cpu_percent=12.5, memory_usage=256000000, memory_limit=1073741824, memory_percent=23.8)
         try:
@@ -168,7 +171,7 @@ class DockerService:
             logger.error(f"Error getting container stats: {e}")
             return None
 
-    def get_container_logs(self, container_id: str, tail: int = 100, since: Optional[str] = None) -> str:
+    def get_container_logs(self, container_id: str, tail: int = 100, since: str | None = None) -> str:
         if not self.is_available():
             return f"[MOCK] Logs for container {container_id}\n2024-01-01T00:00:00Z INFO Application started\n2024-01-01T00:00:01Z INFO Listening on port 8080"
         try:
@@ -177,7 +180,7 @@ class DockerService:
             return logs
         except Exception as e:
             logger.error(f"Error getting logs: {e}")
-            return f"Error retrieving logs: {str(e)}"
+            return f"Error retrieving logs: {e!s}"
 
     def start_container(self, container_id: str) -> bool:
         if not self.is_available():
@@ -231,8 +234,7 @@ class DockerService:
                 image=data.image,
                 status="created",
                 state="created",
-                created=datetime.utcnow().isoformat(),
-            )
+                created=datetime.now(UTC).isoformat(),            )
         try:
             port_bindings = None
             if data.ports:
@@ -261,7 +263,7 @@ class DockerService:
             logger.error(f"Error creating container: {e}")
             raise
 
-    def list_images(self) -> List[ImageInfo]:
+    def list_images(self) -> list[ImageInfo]:
         if not self.is_available():
             return [
                 ImageInfo(id="sha256:abc", tags=["nginx:latest"], size=142000000, created="2024-01-01"),
@@ -283,7 +285,7 @@ class DockerService:
             logger.error(f"Error listing images: {e}")
             return []
 
-    def list_volumes(self) -> List[VolumeInfo]:
+    def list_volumes(self) -> list[VolumeInfo]:
         if not self.is_available():
             return [VolumeInfo(name="data_vol", driver="local", mountpoint="/var/lib/docker/volumes/data_vol", created="2024-01-01")]
         try:
@@ -303,7 +305,7 @@ class DockerService:
             logger.error(f"Error listing volumes: {e}")
             return []
 
-    def list_networks(self) -> List[NetworkInfo]:
+    def list_networks(self) -> list[NetworkInfo]:
         if not self.is_available():
             return [NetworkInfo(id="bridge", name="bridge", driver="bridge", scope="local")]
         try:
@@ -325,7 +327,7 @@ class DockerService:
             logger.error(f"Error listing networks: {e}")
             return []
 
-    def _mock_containers(self) -> List[ContainerInfo]:
+    def _mock_containers(self) -> list[ContainerInfo]:
         return [
             ContainerInfo(
                 id="abc123",

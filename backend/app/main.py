@@ -1,13 +1,14 @@
+import logging
+import time
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
-from contextlib import asynccontextmanager
-import logging
-import time
 
+from app.api.v1 import auth, dashboard, docker, github, kubernetes, terminal
 from app.core.config import settings
-from app.db.session import engine, Base
-from app.api.v1 import auth, docker, kubernetes, github, dashboard, terminal
+from app.db.session import Base, engine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
-from pydantic_settings import BaseSettings
-from typing import List, Optional
-from pathlib import Path
 import os
+from pathlib import Path
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     
     # CORS
-    BACKEND_CORS_ORIGINS: List[str] = [
+    BACKEND_CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:8000",
@@ -34,21 +34,21 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
     
     # Docker
-    DOCKER_HOST: Optional[str] = os.getenv("DOCKER_HOST", "unix:///var/run/docker.sock")
+    DOCKER_HOST: str | None = os.getenv("DOCKER_HOST", "unix:///var/run/docker.sock")
     
     # Kubernetes
-    KUBECONFIG: Optional[str] = os.getenv("KUBECONFIG", None)
+    KUBECONFIG: str | None = os.getenv("KUBECONFIG", None)
     K8S_IN_CLUSTER: bool = os.getenv("K8S_IN_CLUSTER", "false").lower() == "true"
     
     # GitHub OAuth App (create at https://github.com/settings/developers)
-    GITHUB_CLIENT_ID: Optional[str] = os.getenv("GITHUB_CLIENT_ID", None)
-    GITHUB_CLIENT_SECRET: Optional[str] = os.getenv("GITHUB_CLIENT_SECRET", None)
+    GITHUB_CLIENT_ID: str | None = os.getenv("GITHUB_CLIENT_ID", None)
+    GITHUB_CLIENT_SECRET: str | None = os.getenv("GITHUB_CLIENT_SECRET", None)
     GITHUB_REDIRECT_URI: str = os.getenv(
         "GITHUB_REDIRECT_URI",
         "http://localhost:8000/api/v1/auth/github/callback"
     )
     # Optional org-level PAT fallback for server-side calls
-    GITHUB_TOKEN: Optional[str] = os.getenv("GITHUB_TOKEN", None)
+    GITHUB_TOKEN: str | None = os.getenv("GITHUB_TOKEN", None)
     GITHUB_API_URL: str = "https://api.github.com"
     
     # Rate Limiting
